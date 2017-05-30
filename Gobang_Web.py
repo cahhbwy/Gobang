@@ -33,11 +33,11 @@ if method in ["load", "play", "help"]:
     with open(filename, "r") as f:
         board = f.readline()[:-1]
         status = f.readline()
-        if status is not "continue":
+        if status != "continue":
             message = status
             print message
             print board
-            exit(0)
+            exit(2)
 else:
     board = "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
     message = "continue"
@@ -85,6 +85,8 @@ if method == "play":
                         message = "continue"
                 else:
                     message = "peace"
+        else:
+            message = "peace"
         gobang.save(filename)
         with open(filename, "r") as f:
             board = f.readline()[:-1]
@@ -95,9 +97,10 @@ if method == "play":
         print ai_x
         print ai_y
 else:
-    x = 7
-    y = 7
+    gobang = Gobang()
+    gobang.board[1:16, 1:16] = chess
+    help_x, help_y = gobang.value(-1)
     message = "help"
     print message
-    print x
-    print y
+    print help_x
+    print help_y

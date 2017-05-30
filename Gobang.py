@@ -153,7 +153,7 @@ class Gobang:
             return argmax_2[0][choice], argmax_2[1][choice]
 
     def input(self, i, j, player=1):
-        if 0 <= i < self.size and 0 <= j < self.size:
+        if 0 <= i < self.size + 2 and 0 <= j < self.size + 2:
             if self.board[i, j] == 0:
                 self.board[i, j] = player
                 return True
