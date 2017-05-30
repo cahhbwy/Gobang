@@ -2,8 +2,9 @@
 # coding:utf-8
 
 
-import numpy
+from Gobang import *
 import argparse
+import numpy
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filepath", help="chessboard status file")
@@ -18,6 +19,7 @@ user_x = -1
 user_y = -1
 
 board = ""
+status = "continue"
 message = ""
 ai_x = -1
 ai_y = -1
@@ -30,6 +32,12 @@ if method not in ["load", "restart", "play", "help"]:
 if method in ["load", "play", "help"]:
     with open(filename, "r") as f:
         board = f.readline()[:-1]
+        status = f.readline()
+        if status is not "continue":
+            message = status
+            print message
+            print board
+            exit(0)
 else:
     board = "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
     message = "continue"
@@ -63,19 +71,25 @@ if method == "play":
         print ai_y
         exit(2)
     else:
-        chess[user_x, user_y] = 1
-        blank_x, blank_y = numpy.where(chess == 0)
-        if blank_x.size == 0:
-            message = "peace"
-        else:
-            rand_choice = numpy.random.randint(blank_x.size)
-            ai_x, ai_y = blank_x[rand_choice], blank_y[rand_choice]
-            chess[ai_x, ai_y] = -1
-            message = "continue"
-        board = chess.reshape(225) + 1
-        board = ''.join(map(lambda x: str(x), board.tolist()))
-        with open(filename, "w") as f:
-            f.write(board + "\n")
+        gobang = Gobang()
+        gobang.board[1:16, 1:16] = chess
+        if gobang.input(user_x + 1, user_y + 1, 1):
+            if gobang.win(user_x + 1, user_y + 1, 1):
+                message = "win"
+            else:
+                ai_x, ai_y = gobang.value(-1)
+                if gobang.input(ai_x + 1, ai_y + 1, -1):
+                    if gobang.win(ai_x + 1, ai_y + 1, -1):
+                        message = "loss"
+                    else:
+                        message = "continue"
+                else:
+                    message = "peace"
+        gobang.save(filename)
+        with open(filename, "r") as f:
+            board = f.readline()[:-1]
+        with open(filename, "a") as f:
+            f.write(message)
         print message
         print board
         print ai_x
